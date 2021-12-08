@@ -40,33 +40,37 @@ image = np.load("ps.npy")
 labeled = label(image)
 counting_masks = [[]]
 num = 0
+count_masks = 0
 print(len(labeled))
 while(np.count_nonzero(image) != 0):
 
     plt.subplot(121)
     plt.imshow(image)
-    cur_area = area(labeled,1)[0]
-    print(cur_area)
-    pxs = area(labeled,1)[1]
-    #print(pxs)
-    #if(str(cur_area)) in found_masks:
-    #    compare_mask(found_masks[str(cur_area)])
-    
-    
+    #cur_area = area(labeled,1)[0]
+    if count_masks<4:
+        for i in range(1,len(labeled)):
+            
+            cur_area = area(labeled,i)[0]
+            if cur_area > 10:
+                pxs = area(labeled,i)[1]
+                break
+    else:   
+       cur_area = area(labeled,1)[0]     
+       pxs = area(labeled,1)[1]
+       
     found_mask = get_mask(labeled, pxs)
+    count_masks+=1
     print(found_mask)
     result_mask = morphology.binary_opening(labeled,found_mask)
     count = np.count_nonzero(morphology.binary_erosion(labeled,found_mask))
     counting_masks.append([found_mask,count])
     num+=count
-    print(count)
+    print("Figure amount: ",count)
     image = image - result_mask
     labeled = label(image)
-    #print(edge_xy(labeled, pxs))
-    
-    
+       
 
     plt.subplot(122)
     plt.imshow(image)
     plt.show()
-print(num)
+print("Common amount: ",num)
